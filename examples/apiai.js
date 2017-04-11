@@ -1,6 +1,6 @@
 var http = require('http');
 var apiai = require('apiai');
-var Request = require('request');
+var request = require('request');
 var uuid = require('uuid');
 var url = require('url');
 // var app = apiai("140f6176c51a409088826f731c199287"); // HotelBooking
@@ -10,18 +10,18 @@ let headers = {
     'Authorization': 'Bearer efac800c605f484ca6c256d9e6d0a158',
     'Content-Type': 'application/json; charset=utf-8'
 }
-var server = http.createServer(function(request, response) {
-    var queryData = url.parse(request.url, true).query;
+var server = http.createServer(function(req, res) {
+    var queryData = url.parse(req.url, true).query;
     console.log(queryData);
     if (!!queryData.q) { // To avoid multiple calls on refresh
-        response.writeHead(200, { "Content-Type": "text/plain" });
+        res.writeHead(200, { "Content-Type": "text/plain" });
 
         let opts2 = {
             uri: 'https://api.api.ai/v1/entities',
             headers: headers,
             json: true
         }
-        Request.get(opts2, function(err, resp, body) {
+        request.get(opts2, function(err, resp, body) {
             console.log("err1:", err);
             console.log("body1:", body);
             let id;
@@ -38,7 +38,7 @@ var server = http.createServer(function(request, response) {
                 headers: headers,
                 json: true
             }
-            Request.get(opts, function(err, resp, body2) {
+            request.get(opts, function(err, resp, body2) {
                 console.log("err2:", err);
                 console.log("body2:", body2);
                 let entries = [{
@@ -55,7 +55,7 @@ var server = http.createServer(function(request, response) {
                     headers: headers,
                     json: true
                 }
-                Request.put(opts, function(err, resp, body3) {
+                request.put(opts, function(err, resp, body3) {
                     console.log("err3:", err);
                     console.log("body3:", body3);
                     let result = {
@@ -64,7 +64,7 @@ var server = http.createServer(function(request, response) {
                         postedData: postData.entries,
                         updateStatus: body3
                     }
-                    response.end(JSON.stringify(result));
+                    res.end(JSON.stringify(result));
                 });
             });
         });
